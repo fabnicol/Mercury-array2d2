@@ -3,7 +3,7 @@
 This library has been straightforwardly adapted from the language library
 array2d.m.  
 The code in array2d2.m is subject to the same licensing conditions as those of
-the original Mercury source code (see COPYING.LIB and COPYING).  
+the original Mercury source code (see COPYING.LIB).  
   
 ### Motivation
   
