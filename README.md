@@ -10,7 +10,7 @@ the original Mercury source code (see COPYING.LIB and COPYING).
 This library proposes to store 2d data in column-major order, while the
 standard library uses row-major order.  
 This will facilitate interfacing with statistical software (like R and Python
-libraries), which often store 2d data in column-major data tables (like R's
+libraries), which often stores 2d data in column-major data tables (like R's
 data frames).  
 The expected benefit is that, if used properly in conjunction with appropriate
 representations of empirical issues, transposing operations should be avoided,
@@ -20,7 +20,7 @@ with the related processing overhead.
 
 Just run `make` (or `make clean` to clean up the build).  
 A small test file will be compiled together with the library.  
-To just build the library, run `mmakefile depend && mmakefile`  
+To just build the library, run `mmake depend && mmake`  
 
 
 
