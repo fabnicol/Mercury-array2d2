@@ -203,8 +203,8 @@
 % ---- Array transpose utility ---------------------------------------------%
 
     % transpose_array2d(Array):
-    % 
-    % Return the transposed given 2d array. 
+    %
+    % Return the transposed given 2d array.
     % If Array of dimension (M, N) has the standard list representation:
     %
     %    [[X11, ..., X1N], ..., [XM1, ..., XMN]]
@@ -216,8 +216,8 @@
 :- func transpose_array2d(array2d(T)) = array2d(T).
 
     % transpose_array2d2(Array):
-    % 
-    % Return the transposed given 2d2 column-major array. 
+    %
+    % Return the transposed given 2d2 column-major array.
     % If Array of dimension (M, N) has the standard list representation:
     %
     %    [[X11, ..., XM1], ..., [X1N, ..., XMN]]
@@ -225,7 +225,7 @@
     % then the returned array has the same list representation
     % in row-major order (if mapped as a 2d array).
     %
-    
+
 :- func transpose_array2d2(array2d2(T)) = array2d2(T).
 
 %---------------------------------------------------------------------------%
@@ -309,15 +309,21 @@ from_array(NumRows, NumColumns, Array) = Array2d :-
     ).
 
 %--- Conversions between array2d and array2d2 ------------------------------%
-    
-from_array2d(Array2d) = array2d2(lists(transpose_array2d(Array2d))).
 
-to_array2d(Array2d2) = array2d(lists(transpose_array2d2(Array2d2))).
+from_array2d(Array2d) = Array2d2 :-
+    Array2d = array2d(NumRows, NumCols, A),
+    transpose_array(A, NumCols) = TA,
+    Array2d2 = array2d2(NumRows, NumCols, TA).
+
+to_array2d(Array2d2) = Array2d :-
+    Array2d2 = array2d2(NumRows, NumCols, A),
+    transpose_array(A, NumRows) = TA,
+    Array2d = array2d(NumRows, NumCols, TA).
 
 %--- Array transpose utility -----------------------------------------------%
- 
+
 % For column-major arrays, use NumRows as N in the inverse transpose
-% Cate & Twigg formula.    
+% Cate & Twigg formula.
 
 transpose_array2d2(Array) = TransposedArray :-
     Array = array2d2(NumRows, NumCols, A),
@@ -325,17 +331,17 @@ transpose_array2d2(Array) = TransposedArray :-
     TransposedArray = array2d2(NumCols, NumRows, TA).
 
 % For row-major arrays, use NumCols as N in the inverse transpose
-% Cate & Twigg formula.    
+% Cate & Twigg formula.
 
 transpose_array2d(Array) = TransposedArray :-
     Array = array2d(NumRows, NumCols, A),
     transpose_array(A, NumCols) = TA,
     TransposedArray = array2d(NumCols, NumRows, TA).
-    
+
 :- func transpose_array(array(T), int) = array(T).
 
-% Note: The implementation is inefficient as it does not use cycle 
-% properties or in-cache memory optimization. 
+% Note: The implementation is inefficient as it does not use cycle
+% properties or in-cache memory optimization.
 % We are using the simple Cate & Twigg (inverse transpose) formula.
 
 transpose_array(Array, N) = TransposedArray :-
