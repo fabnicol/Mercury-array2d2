@@ -20,6 +20,8 @@ with the related processing overhead.
 
 Just run `make` (or `make clean` to clean up the build).  
 A small test file will be compiled together with the library.  
+To just build the library, run `mmakefile depend && mmakefile`  
+
 
 
 

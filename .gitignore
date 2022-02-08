@@ -3,3 +3,16 @@ Mercury
 *.mh
 *~
 '#*'
+*.c
+*.date*
+*.dep
+*.init
+*.int*
+*.pic_o
+*.o
+*.d*
+*.opt
+*.c_date
+*.optdate
+*.a
+*.so
