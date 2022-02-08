@@ -3,6 +3,7 @@
 %---------------------------------------------------------------------------%
 % Copyright (C) 2003, 2005-2007, 2011-2012 The University of Melbourne.
 % Copyright (C) 2013-2018 The Mercury team.
+% Copyright (C) 2022 Fabrice Nicol (adaptations from array2d.m).
 % This file is distributed under the terms specified in COPYING.LIB.
 %---------------------------------------------------------------------------%
 %
@@ -199,6 +200,34 @@
     %
 :- pred fill(T::in, array2d2(T)::array2d2_di, array2d2(T)::array2d2_uo) is det.
 
+% ---- Array transpose utility ---------------------------------------------%
+
+    % transpose_array2d(Array):
+    % 
+    % Return the transposed given 2d array. 
+    % If Array of dimension (M, N) has the standard list representation:
+    %
+    %    [[X11, ..., X1N], ..., [XM1, ..., XMN]]
+    %
+    % then the returned array has the same list representation
+    % in column-major order (if mapped as a 2d2 array).
+    %
+
+:- func transpose_array2d(array2d(T)) = array2d(T).
+
+    % transpose_array2d2(Array):
+    % 
+    % Return the transposed given 2d2 column-major array. 
+    % If Array of dimension (M, N) has the standard list representation:
+    %
+    %    [[X11, ..., X1M], ..., [XN1, ..., XNM]]
+    %
+    % then the returned array has the same list representation
+    % in row-major order (if mapped as a 2d array).
+    %
+    
+:- func transpose_array2d2(array2d2(T)) = array2d2(T).
+
 %---------------------------------------------------------------------------%
 %---------------------------------------------------------------------------%
 
@@ -279,13 +308,50 @@ from_array(NumRows, NumColumns, Array) = Array2d :-
         error($pred, " bounds must be non-negative")
     ).
 
-from_array2d(Array2d) = Array2d2 :-
-    Array2d = array2d(NumRows, NumColumns, A),
-    Array2d2 = array2d2(NumRows, NumColumns, A).
+%--- Conversions between array2d and array2d2 ------------------------------%
+    
+from_array2d(Array2d) = array2d2(lists(transpose_array2d(Array2d))).
 
-to_array2d(Array2d2) = Array2d :-
-    Array2d2 = array2d2(NumRows, NumColumns, A),
-    Array2d = array2d(NumRows, NumColumns, A).
+to_array2d(Array2d2) = array2d(lists(transpose_array2d2(Array2d2))).
+
+%--- Array transpose utility -----------------------------------------------%
+ 
+% For column-major arrays, use NumRows as N in the inverse transpose
+% Cate & Twigg formula.    
+
+transpose_array2d2(Array) = TransposedArray :-
+    Array = array2d2(NumRows, NumCols, A),
+    transpose_array(A, NumRows) = TA,
+    TransposedArray = array2d2(NumCols, NumRows, TA).
+
+% For row-major arrays, use NumCols as N in the inverse transpose
+% Cate & Twigg formula.    
+
+transpose_array2d(Array) = TransposedArray :-
+    Array = array2d(NumRows, NumCols, A),
+    transpose_array(A, NumCols) = TA,
+    TransposedArray = array2d(NumCols, NumRows, TA).
+    
+:- func transpose_array(array(T), int) = array(T).
+
+% Note: The implementation is inefficient as it does not use cycle 
+% properties or in-cache memory optimization. 
+% We are using the simple Cate & Twigg (inverse transpose) formula.
+
+transpose_array(Array, N) = TransposedArray :-
+    Size = size(Array),
+    array(map(lookup(Array),
+          map(transpose_index(N, Size), 0 `..` (Size - 1))))
+        = TransposedArray.
+
+:- func transpose_index(int, int, int) = int.
+
+transpose_index(N, Size, Index) = Result :-
+    ( if Index = Size -1 then
+        Result = Size - 1
+    else
+        Result = (N * Index) mod (Size -1)
+    ).
 
 %---------------------------------------------------------------------------%
 
@@ -354,17 +420,17 @@ unsafe_set(R, C, Value, !Array) :-
 %---------------------------------------------------------------------------%
 
 lists(array2d2(NumRows, NumColumns, A)) = Columns :-
-    get_columns(NumRows - 1, NumColumns, A, [], Columns).
+    get_columns(NumRows, NumColumns - 1, A, [], Columns).
 
 :- pred get_columns(int, int, array(T), list(list(T)), list(list(T))).
 % :- mode get_columns(in, in, array_ui, in, out) is det.
 :- mode get_columns(in, in, in, in, out) is det.
 
-get_columns(ColumnNum, NumRows, A, !Columns) :-
+get_columns(NumRows, ColumnNum, A, !Columns) :-
     ( if ColumnNum >= 0 then
-        get_rows(ColumnNum, NumRows - 1, NumRows, A, [], Rows),
+        get_rows(NumRows - 1, ColumnNum, NumRows, A, [], Rows),
         !:Columns = [Rows | !.Columns],
-        get_columns(ColumnNum - 1, NumRows, A, !Columns)
+        get_columns(NumRows, ColumnNum - 1, A, !Columns)
     else
         true
     ).

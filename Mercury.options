@@ -1,14 +1,14 @@
 INSTALL_PREFIX=local
 
 MAIN_TARGET = libarray2d2
-
+         
 MCFLAGS = \
 	--libgrades-exclude csharp					\
 	--libgrades-exclude java 					\
 	--libgrades-exclude spf						\
-	--install-prefix $(INSTALL_PREFIX)  		\
+	--install-prefix $(INSTALL_PREFIX)  		
 
-MCFLAGS-ri = --no-warn-nothing-exported \
+MCFLAGS-array2d2 = --no-warn-nothing-exported \
              --no-warn-interface-imports \
              --mercury-linkage static \
              --optimise-constructor-last-call  \
