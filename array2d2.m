@@ -29,7 +29,7 @@
 %---------------------------------------------------------------------------%
 
     % An array2d2 is a two-dimensional array stored in column-major order
-    % (that is, the elements of the first column in left-to-right
+    % (that is, the elements of the first column in top-to-bottom
     % order, followed by the elements of the second column and so forth.)
     %
 :- type array2d2(T).
