@@ -220,7 +220,7 @@
     % Return the transposed given 2d2 column-major array. 
     % If Array of dimension (M, N) has the standard list representation:
     %
-    %    [[X11, ..., X1M], ..., [XN1, ..., XNM]]
+    %    [[X11, ..., XM1], ..., [X1N, ..., XMN]]
     %
     % then the returned array has the same list representation
     % in row-major order (if mapped as a 2d array).
